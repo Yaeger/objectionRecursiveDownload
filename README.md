@@ -16,14 +16,27 @@
 [forks]:https://github.com/Yaeger/objectionRecursiveDownload/network
 [issues]:https://github.com/Yaeger/objectionRecursiveDownload/issues
 
-### objectionRecursiveDownload: A simple node.js wrapper script written to recursavly download an application directory through sensepost's objection framework and frida.
+### objectionRecursiveDownload: A simple node.js wrapper script written to recursively download an application directory through sensepost's objection toolkit and the Frida instrumentation toolkit.
 
 The scripts requires frida and objection to be installed localy and can support either an injected frida-gadget or frida-server on the device. 
+
+***
+
+Usage: node dl.js [options]
+
+This script wraps the objection tool from sensepost to recursively download application files from a connected device.
+
+Options:
+                -j --gadget option passed to objection
+
+Example: node dl.js -j '--gadget "App Name"'
+
+***
 
 ### Author, Contributors, and License
 * Author: Aaron Yaeger - 2019
 * License: BSD 3-Clause
-* Required Dependencies: node.js frida objection
+* Required Dependencies: [node.js](https://nodejs.org/en/) [frida](https://www.frida.re) [objection](https://github.com/sensepost/objection)
 
 ### Issue Reports
 
