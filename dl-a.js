@@ -1,12 +1,13 @@
-// Global Variables
+// Global Variables Setup
 const fs = require("fs");
 var appName = new String;
 var device = new String;
 var localBasePath = new String;
 var directoryList = new Array;
 var directoryAppDelimeter = new String;
-
 var objectionOptions = new String;
+
+// Command Line argument Processing
 for (let j = 0; j < process.argv.length; j++) {  
     if (process.argv[j] == "-j") { 
         if (process.argv[j+1]) {
@@ -35,6 +36,7 @@ for (let j = 0; j < process.argv.length; j++) {
     }
 }
 
+// Query device and set variables and initial application search path
 var initialize = async () => {
     console.log(`Seeding the initial recursive search....`);
         
@@ -62,6 +64,7 @@ var initialize = async () => {
     await createDir(localBasePath);
 }
 
+// List device directory and call createDir or downloadFile for eash item listed. Then call addDir for any directories.
 var processDir = async (directory) => {
     if ( !directory.match(/.*\/$/) ) { directory = directory + "/"; }
     const { exec } = require('child_process');
@@ -98,29 +101,21 @@ var processDir = async (directory) => {
     return;
 }
 
-function createDir(localDirectory) {
-    return new Promise((resolve, reject) => {
-        console.log(` -- Creating Local Directory: ${localDirectory}`);
-        if (fs.existsSync(localDirectory)) { 
-            console.log(` --- Local Directory Already Exists`);
-            resolve();
-        } else { 
-                const { exec } = require('child_process');
-                exec(`mkdir -p ${localDirectory}`, (err, stdout, stderr) => {
-                    if (err) {
-                        // node couldn't execute the command
-                        console.log(`stderr: ${stderr}`);
-                        return reject(err);
-                    }
-                    console.log(` --- Directory Created: ${localDirectory}`);
-                    resolve();
-                })
-        }
-    })
+// Create a local directory
+var createDir = async (localDirectory) => {
+    console.log(` -- Creating Local Directory: ${localDirectory}`);
+    if (fs.existsSync(localDirectory)) { 
+        console.log(` --- Local Directory Already Exists`);
+    } else { 
+        var createDirectoryResults = await executeCMD(`mkdir -p ${localDirectory}`);
+        console.log(` --- Directory Created: ${localDirectory}`);
+    }
 }
 
-var executeCMD=(cmd) => {
+// Execute a OS command
+var executeCMD = (cmd) => {
     return new Promise((resolve, reject) => {
+        console.log(`Executing: ${cmd}`);
         const { exec } = require('child_process');
         exec(cmd, (err, stdout, stderr) => {
             if (err) {
@@ -135,41 +130,35 @@ var executeCMD=(cmd) => {
             //console.debug(`stdout: ${stdout}`);
             //console.debug(`---------------------------------------------------------------------`);
             //console.debug(``);
+            console.log(`Executing: ${cmd} - SUCCESS`);
             resolve(stdout);
         })
     });
 }
 
-function addDir(directory) {
+// Add a directory to DirectoryList
+var addDir = (directory) => {
     directoryList.push(directory);
     console.log(` -- Added Directory to Queue: ${directory} (Count: ${directoryList.length})`);
 }
 
-function downloadFile(remoteFile, LocalPath){
-    return new Promise((resolve, reject) => {
-        console.log(` -- Downloading File - from: ${remoteFile} To: ${LocalPath}`);
-        if (fs.existsSync(LocalPath)) { 
-            console.log(` --- Local File Already Exists`);
-            resolve(); 
-        } else {
-            const { exec } = require('child_process');
-            exec(`objection ${objectionOptions} run file download  ${remoteFile} ${LocalPath}`, (err, stdout, stderr) => {
-                if (err) {
-                    // node couldn't execute the command
-                    console.log(`stderr: ${stderr}`);
-                    return reject(err);
-                }
-                    console.log(` --- File Download Successful: ${LocalPath}`);
-                    resolve();
-            })
-        }
-    })
+// Download a file
+var downloadFile = async (remoteFile, LocalPath) => {
+    console.log(` -- Downloading File - from: ${remoteFile} To: ${LocalPath}`);
+    if (fs.existsSync(LocalPath)) { 
+        console.log(` --- Local File Already Exists`);
+    } else {
+        var downloadFileResults = await executeCMD(`objection ${objectionOptions} run file download  ${remoteFile} ${LocalPath}`);
+        console.log(` --- File Download Successful: ${LocalPath}`);
+    }   
 }
 
+// Main Function
 async function main () {
     console.log(`############## Starting Recursive Application Download ##############`);
     await initialize();
 
+    // While a unprocessed directories exists pop a directory from the list and process it.
     while (directoryList.length > 0) {
         await processDir(directoryList.pop());
     }
