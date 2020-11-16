@@ -21,8 +21,12 @@ for (let j = 0; j < process.argv.length; j++) {
             console.log(`                -j --gadget option passed to objection`);
             console.log();
             console.log(`Example: node dl.js -j '--gadget "App Name"'`);
+            console.log();
+            console.log(`                -i dynamic ios injection suppoort`);
             process.exit();
         }
+    } else if (process.argv[j] == "-i") {
+            objectionOptions = "";
     } else if (process.argv[j] == "-h") {
         console.log(`Usage: node dl.js [options]`);
         console.log();
@@ -32,6 +36,8 @@ for (let j = 0; j < process.argv.length; j++) {
         console.log(`                -j --gadget option passed to objection`);
         console.log();
         console.log(`Example: node dl.js -j '--gadget "App Name"'`);
+        console.log();
+        console.log(`                -i dynamic ios injection suppoort`);
         process.exit();
     }
 }
@@ -41,7 +47,7 @@ var initialize = async () => {
     console.log(`Seeding the initial recursive search....`);
         
     // Query Device Information
-    var deviceTypeResults = await executeCMD(`objection ${objectionOptions} device_type`);
+    var deviceTypeResults = await executeCMD(`objection ${objectionOptions} device-type`);
     var deviceEnvResults = await executeCMD(`objection ${objectionOptions} run env`);
     appName = deviceTypeResults.match(/Name.*/g)[0].split(' ')[1];
     var system = deviceTypeResults.match(/System.*/g)[0].split(' ')[1]; 
